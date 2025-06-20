@@ -42,7 +42,6 @@ void app_main(void) {
 
     static char buf[BUF_SIZE_MAX];
     while (1) {
-        
         fgets(buf, BUF_SIZE_MAX, uart);
         fgetc(uart);
 
