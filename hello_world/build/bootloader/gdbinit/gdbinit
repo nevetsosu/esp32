@@ -1,2 +1,0 @@
-source /home/nevets/code/esp32/hello_world/build/bootloader/gdbinit/symbols
-source /home/nevets/code/esp32/hello_world/build/bootloader/gdbinit/connect
