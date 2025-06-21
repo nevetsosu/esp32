@@ -1,5 +1,5 @@
-.entry.text
-.global call_start_cpu0
+.section .entry.text
+.global _start
 
-call_start_cpu0:
-    call main
+_start:
+    call0 boot
