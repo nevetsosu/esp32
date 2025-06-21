@@ -1,4 +1,4 @@
-ENTRY(call_start_cpu0);
+ENTRY( _start );
 
 MEMORY
 {
@@ -280,6 +280,8 @@ SECTIONS
     /* Code marked as running out of IRAM */
     _iram_text_start = ABSOLUTE(.);
     *(.iram1 .iram1.*)
+    *(.text)
+    *(.text*)
   } > iram0_0_seg
   .dram0.data :
   {

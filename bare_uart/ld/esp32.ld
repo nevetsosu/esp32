@@ -3,16 +3,11 @@
  */
 
 /* Default entry point */
-ENTRY( call_start_cpu0 );
+ENTRY( _start );
 
 /* Specify main memory areas */
 MEMORY
 {
-  /* Use values from the ESP-IDF 'bootloader' component.
-  /* TODO: Use human-readable lengths */
-  /* TODO: Use the full memory map - this is just a test */
-  /* iram_seg ( RX )       : ORIGIN = 0x40080400, len = 0xFC00 */
-
   /* vector tables etc */
   iram0_0_seg (RX) : org = 0x40080000, len = 0x20000 + 0x0
 
@@ -25,7 +20,7 @@ MEMORY
 /* Define output sections */
 SECTIONS {
   /* The program code and other data goes into Instruction RAM */
-  .iram.text :
+  /* .iram.text :
   {
     . = ALIGN(16);
     KEEP(*(.entry.text))
@@ -38,7 +33,54 @@ SECTIONS {
 
     . = ALIGN(4);
     _etext = .;
-  } >iram0_2_seg
+  } >iram0_0_seg */
+
+  /* Send .iram0 code to iram */
+  .iram0.vectors :
+  {
+    _iram_start = ABSOLUTE(.);
+    /* Vectors go to IRAM */
+    _vector_table = ABSOLUTE(.);
+    . = 0x0;
+    KEEP(*(.WindowVectors.text));
+    . = 0x180;
+    KEEP(*(.Level2InterruptVector.text));
+    . = 0x1c0;
+    KEEP(*(.Level3InterruptVector.text));
+    . = 0x200;
+    KEEP(*(.Level4InterruptVector.text));
+    . = 0x240;
+    KEEP(*(.Level5InterruptVector.text));
+    . = 0x280;
+    KEEP(*(.DebugExceptionVector.text));
+    . = 0x2c0;
+    KEEP(*(.NMIExceptionVector.text));
+    . = 0x300;
+    KEEP(*(.KernelExceptionVector.text));
+    . = 0x340;
+    KEEP(*(.UserExceptionVector.text));
+    . = 0x3C0;
+    KEEP(*(.DoubleExceptionVector.text));
+    . = 0x400;
+    _invalid_pc_placeholder = ABSOLUTE(.);
+    *(.*Vector.literal)
+    *(.UserEnter.literal);
+    *(.UserEnter.text);
+    . = ALIGN (16);
+    *(.entry.literal)
+    *(.entry.text)
+    *(.init.literal)
+    *(.init)
+    _init_end = ABSOLUTE(.);
+  } > iram0_0_seg
+  .iram0.text :
+  {
+    /* Code marked as running out of IRAM */
+    _iram_text_start = ABSOLUTE(.);
+    *(.iram1 .iram1.*)
+    *(.text)
+    *(.text*)
+  } > iram0_0_seg
 
   /* Initialized data goes into Data RAM */
   _sidata = .;
