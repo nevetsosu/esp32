@@ -1,34 +1,27 @@
 #include <stdint.h>
+#include "regs.h"
 
-#define GPIO_OUT_W1TS_REG  0x3FF44008
-#define GPIO_OUT_W1TC_REG  0x3FF4400C
-#define GPIO_ENABLE_REG 0x3FF44020
-
-static volatile uint32_t* gpio_out_w1ts_reg = (uint32_t*)GPIO_OUT_W1TS_REG;
-// static volatile uint32_t* gpio_out_w1tc_reg = (uint32_t*)GPIO_OUT_W1TC_REG;
 static volatile uint32_t* gpio_enable_reg = (uint32_t*)GPIO_ENABLE_REG;
-const uint32_t misc_value = 0xdeadbeef;
-uint32_t misc_value2 = 0xdeadbeef;
+static volatile uint32_t* gpio_out_w1ts_reg = (uint32_t*)GPIO_OUT_W1TS_REG;
+static volatile uint32_t* gpio_out_w1tc_reg = (uint32_t*)GPIO_OUT_W1TC_REG;
 
 #define GPIO_PIN 2
 
-void boot() {
-    if (misc_value == 0xdeadbeef) {
-        // enable GPIO PIN
-        *gpio_enable_reg = (1 << GPIO_PIN);
+extern void disable_watchdogs();
+extern void delay_cycles(volatile uint32_t cycles);
 
+void boot() {
+    disable_watchdogs();
+
+    // enable GPIO PIN
+    *gpio_enable_reg = (1 << GPIO_PIN);
+    while (1) {
         // TURN ON
         *gpio_out_w1ts_reg = (1 << GPIO_PIN);
+        delay_cycles(1000000);
+
+        // turn off
+        *gpio_out_w1tc_reg = (1 << GPIO_PIN);
+        delay_cycles(1000000);
     }
-
-    while (1) {};
-
-    // turn off
-    // *gpio_out_w1tc_reg = (1 << GPIO_PIN);
 }
-
-// // Startup logic; this is the application entry point.
-// void __attribute__( ( noreturn ) ) _start() {
-//     boot();
-//     while(1) {};
-// }

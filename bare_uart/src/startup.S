@@ -2,4 +2,6 @@
 .global _start
 
 _start:
-    call0 boot
+    call8 boot
+_start_spinloop:
+    j _start_spinloop
