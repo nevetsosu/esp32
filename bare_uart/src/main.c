@@ -1,27 +1,11 @@
 #include <stdint.h>
 #include "regs.h"
 
-static volatile uint32_t* gpio_enable_reg = (uint32_t*)GPIO_ENABLE_REG;
-static volatile uint32_t* gpio_out_w1ts_reg = (uint32_t*)GPIO_OUT_W1TS_REG;
-static volatile uint32_t* gpio_out_w1tc_reg = (uint32_t*)GPIO_OUT_W1TC_REG;
-
-#define GPIO_PIN 2
-
 extern void disable_watchdogs();
-extern void delay_cycles(volatile uint32_t cycles);
+extern int app_main(void);
 
 void boot() {
     disable_watchdogs();
 
-    // enable GPIO PIN
-    *gpio_enable_reg = (1 << GPIO_PIN);
-    while (1) {
-        // TURN ON
-        *gpio_out_w1ts_reg = (1 << GPIO_PIN);
-        delay_cycles(1000000);
-
-        // turn off
-        *gpio_out_w1tc_reg = (1 << GPIO_PIN);
-        delay_cycles(1000000);
-    }
+    app_main();
 }
