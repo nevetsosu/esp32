@@ -67,7 +67,7 @@ _sram1_iram_len = ( _iram_end > _sram1_iram_start) ? (_iram_end - _sram1_iram_st
 /* the iram_0_0 segment is allowed to have a length of 131072 (0x20000), which exceeds the 128KB size of the physical
     sram0, meaning it CAN spill into sram1 (instr), but since sram1 instr R/W is word-reversed, instructions will appear from the high addresses first */ 
 
-_sram1_DATA_end = 0x40000000
+_sram1_DATA_end = 0x40000000;
 _heap_end = ALIGN(_sram1_DATA_end - _sram1_iram_len - 3, 4);
 /* 0x40000000 is the end of SRAM1 */
 /* the heap is allowed to spill into SRAM1 (data bus) from the low addresses */
