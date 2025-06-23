@@ -26,6 +26,9 @@ MEMORY
      in heap at runtime. However due to static ROM memory usage at this 176KB mark, the
      additional static memory temporarily cannot be used.
   */
+  /*
+    .data and .bss is read out of a portion of SRAM2
+  */
   dram0_0_seg (RW) : org = 0x3FFB0000 + 0,
                                      len = 0x2c200 - 0
   /* Flash mapped constant data */
@@ -61,7 +64,16 @@ MEMORY
 _heap_start = _heap_low_start;
 _sram1_iram_start = 0x400A0000;
 _sram1_iram_len = ( _iram_end > _sram1_iram_start) ? (_iram_end - _sram1_iram_start) : 0;
-_heap_end = ALIGN(0x40000000 - _sram1_iram_len - 3, 4);
+/* the iram_0_0 segment is allowed to have a length of 131072 (0x20000), which exceeds the 128KB size of the physical
+    sram0, meaning it CAN spill into sram1 (instr), but since sram1 instr R/W is word-reversed, instructions will appear from the high addresses first */ 
+
+_sram1_DATA_end = 0x40000000
+_heap_end = ALIGN(_sram1_DATA_end - _sram1_iram_len - 3, 4);
+/* 0x40000000 is the end of SRAM1 */
+/* the heap is allowed to spill into SRAM1 (data bus) from the low addresses */
+/* however, iram_0_0, mapped to SRAM0 (instr bus) can also spill into SRAM1, but from higher addresses, down*/
+/* this heap end calculation, ensures that the heap stops right before the last instruction */
+
 _data_seg_org = ORIGIN(rtc_data_seg);
 /* The lines below define location alias for .rtc.data section based on Kconfig option.
    When the option is not defined then use slow memory segment
