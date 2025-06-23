@@ -298,6 +298,9 @@ SECTIONS
     *(.gnu.linkonce.s2.*)
     *(.jcr)
     *(.data .data.*)
+    /* RODATA HERE FOR NOW SINCE FLASH IS INACCESIBLE */
+    .*(.rodata .rodata.*)
+    /* */
     *(.dram1 .dram1.*)
     _coredump_dram_start = ABSOLUTE(.);
     *(.dram2.coredump .dram2.coredump.*)
@@ -386,7 +389,8 @@ SECTIONS
   .flash.rodata : ALIGN(0x10)
   {
     _flash_rodata_start = ABSOLUTE(.);
-    *(.rodata .rodata.* .sdata2 .sdata2.* .srodata .srodata.*)
+    /* DONT PUT RODATA HERE FOR NOW */
+    /* *(.rodata .rodata.* .sdata2 .sdata2.* .srodata .srodata.*) */
     /* Addresses of memory regions reserved via SOC_RESERVE_MEMORY_REGION() */
     
  . = ALIGN(4); 
