@@ -1,10 +1,10 @@
-#include "regs.h"
 #include <stdint.h>
 
-static volatile uint32_t* timg0_wdt = (uint32_t*)TIMG0_WDTCONFIG0_REG;
-static volatile uint32_t* rtc_wdt  = (uint32_t*)RTC_CNTL_WDTCONFIG0_REG;
+// For disabling watchdog timers
+#define TIMG0_WDTCONFIG0_REG (volatile uint32_t*)(0x3FF5F048)
+#define RTC_CNTL_WDTCONFIG0_REG  (volatile uint32_t*)(0x3FF4808C)
 
 void disable_watchdogs() {
-    *timg0_wdt = 0;
-    *rtc_wdt   = 0;
+    *TIMG0_WDTCONFIG0_REG = 0;
+    *RTC_CNTL_WDTCONFIG0_REG = 0;
 }

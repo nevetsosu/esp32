@@ -1,9 +1,9 @@
-// For disabling watchdog timers
-#define TIMG0_WDTCONFIG0_REG  0x3FF5F048
-#define TIMG1_WDTCONFIG0_REG  0x3FF60048
-#define RTC_CNTL_WDTCONFIG0_REG  0x3FF4808C
+#pragma once
+#include <stdint.h>
 
-// GPIO
-#define GPIO_OUT_W1TS_REG  0x3FF44008
-#define GPIO_OUT_W1TC_REG  0x3FF4400C
-#define GPIO_ENABLE_REG 0x3FF44020
+// IOMUX
+#define IO_MUX_U0RXD_REG (volatile uint32_t*)(0x3FF49084)
+#define IO_MUX_U0TXD_REG (volatile uint32_t*)(0x3FF49088)
+
+#define REG_BIT_SET(x, y) (*x |= (1 << y))
+#define REG_BIT_CLEAR(x, y) (*x &= ~(1 << y))
