@@ -18,14 +18,15 @@ OD = $(TOOLCHAIN)objdump
 # Includes
 INC = -I./include/
 # Linker script location.
-LDSCRIPT = ./ld/esp32.ld
+LDSCRIPT = ./ld/bootloader.ld
 
 # Set C flags.
 CFLAGS += $(INC) -Wall -Werror -std=gnu11 -nostdlib $(CFLAGS_PLATFORM) $(COPT)
 CFLAGS += -fno-strict-aliasing
 CFLAGS += -fdata-sections -ffunction-sections
-# CFLAGS += -Os -g		# Include debugging information and optimize for size
-CFLAGS += -O0
+CFLAGS += -Os		# optimize for size
+CFLAGS += -g		# include debugging information
+# CFLAGS += -O0
 
 # Set LD flags
 LDFLAGS += -nostdlib -T$(LDSCRIPT) -Wl,-Map=$@.map -Wl,--cref -Wl,--gc-sections
@@ -37,12 +38,7 @@ ASFLAGS += -c -O0 -Wall -fmessage-length=0
 ASFLAGS += $(ASFLAGS_PLATFORM)
 
 # Set C source files.
-C_SRC := \
-	./src/main.c \
-	./src/app_main.c \
-	./src/watchdog.c \
-	./src/utils.c \
-	./src/uart.c
+C_SRC := $(wildcard ./src/*.c)
 
 # Set C and Assembly source files.
 ASM_SRC := \
@@ -72,8 +68,13 @@ format: main.elf
 	esptool.py --chip esp32 elf2image --flash_mode=dio --flash_freq 40m --flash_size 4MB -o main.bin main.elf
 
 flash: format
-	esptool.py --chip esp32 --port /dev/ttyUSB0 --baud 460800 --before default_reset --after hard_reset write_flash -z --flash_mode dio --flash_freq 40m --flash_size 4MB 0x1000 main.bin
+	esptool.py --chip esp32 --baud 460800 --before default_reset --after hard_reset write_flash -z --flash_mode dio --flash_freq 40m --flash_size 4MB 0x1000 main.bin
 
+monitor:
+	python -m serial.tools.miniterm /dev/ttyUSB0 115200
+
+erase:
+	esptool.py erase_flash
 # Target to clean build artifacts.
 .PHONY: clean
 clean:
