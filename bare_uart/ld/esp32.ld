@@ -311,7 +311,8 @@ SECTIONS
     *(.jcr)
     *(.data .data.*)
     /* RODATA HERE FOR NOW SINCE FLASH IS INACCESIBLE */
-    .*(.rodata .rodata.*)
+    /* BOOKMARK */
+    /* *(.rodata .rodata.*) */
     /* */
     *(.dram1 .dram1.*)
     _coredump_dram_start = ABSOLUTE(.);
@@ -327,8 +328,8 @@ SECTIONS
   {
     _ext_ram_noinit_start = ABSOLUTE(.);
     *(.ext_ram_noinit*)
-    
- . = ALIGN(4); 
+
+ . = ALIGN(4);
  _ext_ram_noinit_end = ABSOLUTE(.);
   } > extern_ram_seg
   /**
@@ -402,7 +403,8 @@ SECTIONS
   {
     _flash_rodata_start = ABSOLUTE(.);
     /* DONT PUT RODATA HERE FOR NOW */
-    /* *(.rodata .rodata.* .sdata2 .sdata2.* .srodata .srodata.*) */
+    /* BOOKMARK */
+    *(.rodata .rodata.* .sdata2 .sdata2.* .srodata .srodata.*)
     /* Addresses of memory regions reserved via SOC_RESERVE_MEMORY_REGION() */
     
  . = ALIGN(4); 
