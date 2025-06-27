@@ -6,6 +6,7 @@ _stack_start:
     .word _heap_end
 
 .section .entry.text
+.literal_position
 .global _start
 
 _start:
