@@ -3,6 +3,16 @@
 TOOLCHAIN = xtensa-esp32-elf-
 
 CFLAGS_PLATFORM  = -mlongcalls -mtext-section-literals -fstrict-volatile-bitfields
+# CFLAGS_PLATFORM += -specs=nosys.specs		# provide stubs for sys calls
+CFLAGS_PLATFORM += -nostdlib
+CFLAGS_PLATFORM += -nodefaultlibs
+CFLAGS_PLATFORM += -fno-builtin
+CFLAGS_PLATFORM += -nostartfiles
+CFLAGS_PLATFORM += -L$(NEWLIB_LPATH)
+CFLAGS_PLATFORM += -I$(NEWLIB_IPATH)
+CFLAGS_PLATFORM += -lc						# link c standard library from newlib
+CFLAGS_PLATFORM += -lgcc					# link gcc low level support lib
+
 ASFLAGS_PLATFORM = $(CFLAGS_PLATFORM)
 LDFLAGS_PLATFORM = $(CFLAGS_PLATFORM)
 
@@ -21,7 +31,7 @@ INC = -I./include/
 LDSCRIPT = ./ld/bootloader.ld
 
 # Set C flags.
-CFLAGS += $(INC) -Wall -Werror -std=gnu11 -nostdlib $(CFLAGS_PLATFORM) $(COPT)
+CFLAGS += $(INC) -Wall -Werror -std=gnu11 $(CFLAGS_PLATFORM) $(COPT)
 CFLAGS += -fno-strict-aliasing
 CFLAGS += -fdata-sections -ffunction-sections
 CFLAGS += -Os		# optimize for size
@@ -29,9 +39,8 @@ CFLAGS += -g		# include debugging information
 # CFLAGS += -O0
 
 # Set LD flags
-LDFLAGS += -nostdlib -T$(LDSCRIPT) -Wl,-Map=$@.map -Wl,--cref -Wl,--gc-sections
+LDFLAGS += -T$(LDSCRIPT) -Wl,-Map=$@.map -Wl,--cref -Wl,--gc-sections
 LDFLAGS += $(LDFLAGS_PLATFORM)
-LDFLAGS += -lm -lc -lgcc
 
 # Set AS flags
 ASFLAGS += -c -O0 -Wall -fmessage-length=0
@@ -59,7 +68,7 @@ all: main.elf
 	$(CC) -c $(CFLAGS) $< -o $@
 
 main.elf: $(OBJS)
-	$(CC) $(LDFLAGS) $^ -o $@
+	$(CC) $^ $(LDFLAGS) -o $@
 
 dump: main.elf
 	$(OD) -D $<
@@ -73,9 +82,16 @@ flash: format
 monitor:
 	python -m serial.tools.miniterm /dev/ttyUSB0 115200
 
+openocd: format
+	openocd -f interface/ftdi/esp32_devkitj_v1.cfg -f target/esp32.cfg
+
+gdb: main.elf
+	xtensa-esp32-elf-gdb $<
+	# -ex "target remote localhost:3333"
+
 erase:
 	esptool.py erase_flash
-# Target to clean build artifacts.
+
 .PHONY: clean
 clean:
 	rm -f $(OBJS)
