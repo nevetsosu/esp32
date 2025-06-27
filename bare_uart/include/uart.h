@@ -40,6 +40,9 @@ typedef struct uart_regs_t {
 #define UART1       ((uart_regs_t*)(0x3FF50000))
 #define UART2       ((uart_regs_t*)(0x3FF6E000))
 
+#define APB_CLK_FREQ        40000000  // APB clock = 80 MHz
+#define UART0_BAUD          115200 // double default baud
+
 void uart0_init();
 void uart0_write_str(const char* s);
 void uart0_write_byte(char c);
