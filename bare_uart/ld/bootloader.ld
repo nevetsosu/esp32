@@ -14,6 +14,7 @@ MEMORY
 
 }
 _heap_start = _heap_low_start;
+end =_heap_start;       /* linker symbol for _sbrk in the standard library */
 _sram1_iram_start = 0x400A0000;
 _sram1_iram_len = ( _iram_end > _sram1_iram_start) ? (_iram_end - _sram1_iram_start) : 0;
 _sram1_DATA_end = 0x40000000;
@@ -69,7 +70,8 @@ SECTIONS
 .iram0.text :
 {
     _text_start = ABSOLUTE(.);
-    *(.literal .literal.* .text .text.*)
+    *(.literal .literal.*)
+    *(.text .text.*)
     *(.stub)
     *(.gnu.warning)
     *(.gnu.linkonce.literal.* .gnu.linkonce.t.*.literal .gnu.linkonce.t.*)
